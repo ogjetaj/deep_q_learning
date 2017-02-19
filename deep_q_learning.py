@@ -32,14 +32,19 @@ print(model.summary())
 
 
 def forward_pass(state):
+    "feed forward takes as input a state and returns corresponding prediction"
+
     input = np.empty([1, 1, 8])
     input[0][0] = state
     return model.predict(input)[0]
 
 
 def get_best_action(state):
-    """Returns the index of the action with the highest Q-value, i.e.
+    """This function calls forward_pass function to receive predictions
+        according to a particular input state
+        Returns the index of the action with the highest Q-value, i.e.
         argMax(Q(nxt_state, all_actions))
+
     """
     state_q_values = forward_pass(state)
     return np.argmax(state_q_values)
@@ -48,6 +53,7 @@ def get_best_action(state):
 def get_targets(state, action, reward, next_state):
     """
     Returns a set of target Q-values for a particular <s, a, r, s'> tuple
+    Calls forward_pass for two states
     """
     current_state_q_values = forward_pass(state)
     next_state_q_values = forward_pass(next_state)
@@ -76,6 +82,11 @@ def choose_action(state, epsilon):
 
 
 class Memory(object):
+    """Action for a particular state is chosen as the best action already
+    calculated for that state or a random action with probability epsilon
+    This allows for exploration rate not to decrease as consistency of the
+    values increases.
+    """
     def __init__(self, memory_size=10000, experience_size=1):
         self.experiences = np.empty([0, experience_size], dtype=object)
         self.max_memory_size = memory_size
@@ -121,6 +132,9 @@ def learn_from_replay_memories(memory, batch_size):
     targets. Then train the network sequentally on each individual
     (experience, target) pair.
     """
+    """Call function of class Memory to receive a sample batch.
+    For each experience receive reward values and train model on those values
+    """
     sample_batch = memory.sample_experiences(batch_size)
     for e in sample_batch:
         state, action, reward, new_state = unpack_experience(e)
@@ -128,6 +142,8 @@ def learn_from_replay_memories(memory, batch_size):
         x = np.empty([1, 1, 8])
         x[0][0] = state
         model.train_on_batch(x, targets)
+
+"Initialize instances accordingly. Values are specified after arbitrarily many experiments"
 
 mini_batch_size = 5
 replay_memory_size = 25
@@ -141,9 +157,14 @@ total_reward = np.zeros(max_epochs)
 
 
 for epoch in xrange(max_epochs):
+    "For each epoch, we reset the environment..."
+
     state = env.reset()
     current_step = 0
     epoch_done = False
+    """Within each running epoch, we choose an action outputted from the function
+    pack the experience and add it to the memory space.
+    """
     while current_step < max_steps_per_epoch and not epoch_done:
         # Choose an action using the greedy-epsilon policy
         action = choose_action(state, epsilon)
