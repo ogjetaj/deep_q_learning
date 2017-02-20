@@ -32,7 +32,10 @@ print(model.summary())
 
 
 def forward_pass(state):
-    "feed forward takes as input a state and returns corresponding prediction"
+    """
+    Takes as input a state and returns corresponding Q values prediction
+    for all possible values
+    """
 
     input = np.empty([1, 1, 8])
     input[0][0] = state
