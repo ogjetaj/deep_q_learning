@@ -40,11 +40,11 @@ def forward_pass(state):
 
 
 def get_best_action(state):
-    """This function calls forward_pass function to receive predictions
-        according to a particular input state
-        Returns the index of the action with the highest Q-value, i.e.
-        argMax(Q(nxt_state, all_actions))
-
+    """
+    Calls forward_pass function to receive predictions
+    according to a particular input state
+    Returns the index of the action with the highest Q-value, i.e.
+    argMax(Q(nxt_state, all_actions))
     """
     state_q_values = forward_pass(state)
     return np.argmax(state_q_values)
@@ -82,7 +82,8 @@ def choose_action(state, epsilon):
 
 
 class Memory(object):
-    """Action for a particular state is chosen as the best action already
+    """
+    Action for a particular state is chosen as the best action already
     calculated for that state or a random action with probability epsilon
     This allows for exploration rate not to decrease as consistency of the
     values increases.
@@ -132,9 +133,6 @@ def learn_from_replay_memories(memory, batch_size):
     targets. Then train the network sequentally on each individual
     (experience, target) pair.
     """
-    """Call function of class Memory to receive a sample batch.
-    For each experience receive reward values and train model on those values
-    """
     sample_batch = memory.sample_experiences(batch_size)
     for e in sample_batch:
         state, action, reward, new_state = unpack_experience(e)
@@ -143,7 +141,10 @@ def learn_from_replay_memories(memory, batch_size):
         x[0][0] = state
         model.train_on_batch(x, targets)
 
-"Initialize instances accordingly. Values are specified after arbitrarily many experiments"
+
+# Initialize instances accordingly.
+# Values are specified after arbitrarily many experiments
+
 
 mini_batch_size = 5
 replay_memory_size = 25
@@ -157,14 +158,11 @@ total_reward = np.zeros(max_epochs)
 
 
 for epoch in xrange(max_epochs):
-    "For each epoch, we reset the environment..."
-
+    # After each epoch is done , reset the environment to its initial state
     state = env.reset()
     current_step = 0
     epoch_done = False
-    """Within each running epoch, we choose an action outputted from the function
-    pack the experience and add it to the memory space.
-    """
+
     while current_step < max_steps_per_epoch and not epoch_done:
         # Choose an action using the greedy-epsilon policy
         action = choose_action(state, epsilon)
